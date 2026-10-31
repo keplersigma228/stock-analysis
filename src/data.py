@@ -4,7 +4,7 @@ import pandas as pd
 
 def collect_prices(tickers: list[str], start: str, end: str | None = None) -> pd.DataFrame:
     prices = yf.download(tickers, start=start, end=end)
-    return prices["Close"]
+    return prices["Close"].dropna()
 
 
 def collect_fundamentals(tickers: list[str]):
