@@ -1,7 +1,7 @@
-import sys
 import argparse
 import os
-
+import sys
+from datetime import date
 
 from src.data import collect_prices, collect_fundamentals
 from src.metrics import compute_metrics, normalize, drawdown_series
@@ -11,13 +11,39 @@ from src.plots import plot_performance, plot_risk_return, plot_drawdown
 BENCHMARK = "SPY"
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Collects price and fundamental data for given tickers and generates risk/return metrics and charts.")
-    parser.add_argument("tickers", nargs="+", help="stock tickers")
-    parser.add_argument("--start", default="2020-01-01", help="start date, YYYY-MM-DD")
-    parser.add_argument("--end", default=None, help="end date, YYYY-MM-DD")
-    parser.add_argument("--path", default="reports", help="directory for reports")
-    return parser.parse_args()
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+        "Collects price and fundamental data for given tickers "
+        "and generates risk/return metrics and charts."
+        )
+    )
+    parser.add_argument(
+        "tickers",
+        nargs="+",
+        help="stock tickers"
+    )
+    parser.add_argument(
+        "--start",
+        type=date.fromisoformat,
+        default="2020-01-01",
+        help="start date, YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "--end",
+        type=date.fromisoformat,
+        default=None,
+        help="end date, YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "--path",
+        default="reports",
+        help="directory for reports"
+    )
+    args = parser.parse_args()
+    if args.end is not None and args.start >= args.end:
+        parser.error("--start must be earlier than --end")
+    return args
 
 
 def main():
